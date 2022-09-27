@@ -1,22 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect, useState} from  'react'
+import {db} from "./firebase"
+import {set,ref,onValue,update} from "firebase/database"
+
+
 
 function App() {
+  const [number, setNumber] = useState(onValue(ref(db, 'users/jezz/'), (snapshot) => {
+    const data = snapshot.val();
+    return data.number
+  }))
+  
+
+
+
+  useEffect(()=>{
+    onValue(ref(db, 'users/jezz/'), (snapshot) => {
+      const data = snapshot.val();
+      console.log(data.number)
+      setNumber(data.number)
+    });
+  },[])
+
+  useEffect(()=>{
+    setTimeout(() => {
+      update(ref(db, 'users/jezz/'),{
+        number:number+1
+      })
+      onValue(ref(db, 'users/jezz/'), (snapshot) => {
+        const data = snapshot.val();
+        console.log(data.number)
+        setNumber(data.number)
+      })}, 1000);
+  },[number])
+
+
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        {number}
       </header>
     </div>
   );
